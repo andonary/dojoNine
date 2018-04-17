@@ -1,4 +1,4 @@
-Ecrire une fonction qui prend un argument et qui retourne un ou plusieurs prix en euros.
+Ecrire une fonction qui prend un argument, qui puisse formatter le prix en français et qui retourne un ou plusieurs prix en euros.
 
 * "Je Suis une Chaine" => Erreur (avec la classe Error/ try/catch) "Aucune valeur à traduire"
 * "Je suis une Chaine qui contient un nombre: 232.75" => "232,75€"

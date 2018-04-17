@@ -1,86 +1,51 @@
-/**
- * Permet de convertir le point en virgule
- * @param {String} un nombre en euro
- * @return {String} un nombre en français
- */
-function virguleFonct(argum) {
-  let virgule = argum.replace(/\./, ",");
-  return virgule;
+function transformNombre(nombre) {
+  return (
+    nombre
+      .toString()
+      .replace(/\s/g, "'")
+      .replace(/\./, ",") + "€"
+  );
 }
 
-/**
- * remplace les espaces par des '
- * argument : prix en euro
- */
-function espaceFonct(argum) {
-  let space = argum.replace(/\s/g, "'");
-  return space;
-}
-
-/**
- * Transforme un argument quelquonque en nombre en français avec la devise euro
- * @param {*} argumentQuelquonque
- */
-function currency(argumentQuelquonque) {
-  let regexNotDigit = /^[^\d]+$/;
-
-  // test() => true or false si la regex est bonne..ou pas
-  if (regexNotDigit.test(argumentQuelquonque) === true) {
-    throw new Error("C'est une pure chaine de caractère");
-  }
-
-  // argumentQuelquonque typeof
-  let type = typeof argumentQuelquonque;
-  let estTab = Array.isArray(argumentQuelquonque);
-  let newArray = [];
-
-  //console.log(type, tableau);
-
-  if (typeof argumentQuelquonque === "string") {
-    let virgule = argumentQuelquonque.replace(/\./, ",");
-    //console.log(virgule);
-    let euro = virgule + "€";
-
-    return euro;
-    //console.log(euro);
-    //let space = euro.replace(/\s/g, "'");
-
-    // console.log(espaceFonct(euro));
-  } else if (estTab === true) {
-    argumentQuelquonque.forEach(element => {
-      element = virguleFonct(element + "€");
-      newArray.push(element);
-      //   console.log(element);
+function conversionEuros(phrase) {
+  let result;
+  if (Array.isArray(phrase)) {
+    result = new Array();
+    phrase.map(element => {
+      result.push(transformNombre(element));
     });
-
-    return newArray;
+  } else if (/\d+/g.test(phrase)) {
+    if (/[a-z]+/g.test(phrase)) {
+      let catchNombre = phrase.match(/([\d]+?\s?)+\d+\.\d+/);
+      result = transformNombre(catchNombre[0]);
+    } else {
+      result = transformNombre(phrase);
+    }
+  } else if (typeof phrase === "object") {
+    let { ht, ttc } = phrase;
+    ht = transformNombre(ht);
+    ttc = transformNombre(ttc);
+    result = new Object();
+    result = { ht, ttc };
   } else {
-    let jambonHt = virguleFonct(argumentQuelquonque.ht + "€");
-    // console.log(jambonHt);
-    let jambonTtc = virguleFonct(argumentQuelquonque.ttc + "€");
-    let newObject = { ht: jambonHt, ttc: jambonTtc };
-    // console.log(newObject);
-
-    return newObject;
+    try {
+      throw new Error("Aucune valeur à traduire !!");
+    } catch (e) {
+      console.log(e);
+    }
   }
+  return result;
 }
 
-// try {
-//     eval('alert("Hello world)');
-//   }
-//   catch(error) {
-//     console.error(error);
-//     // expected output: SyntaxError: unterminated string literal
-//     // Note - error messages will vary depending on browser
-//   }
-
-try {
-  currency(12);
-  currency([12, 17, 15.8]);
-  currency({ ht: 250.5, ttc: 255.5, title: "produit 1" });
-  currency("123.2");
-  currency("123 2 456.2");
-  currency("Je suis une chaine");
-} catch (e) {
-  console.log(e.message);
-}
+console.log(conversionEuros([12.75, 15.5, 10, 2]));
+console.log(conversionEuros(15));
+console.log(conversionEuros("42"));
+console.log(conversionEuros("645.45"));
+console.log(conversionEuros("123 456 789.0123"));
+console.log(
+  conversionEuros({ title: "Produit num. 1", ht: "250", ttc: "255.5", tva: 20 })
+);
+console.log(
+  conversionEuros("Je suis une Chaine qui contient un nombre: 123 456 789.75")
+);
+console.log(conversionEuros("Je Suis une Chaine"));
